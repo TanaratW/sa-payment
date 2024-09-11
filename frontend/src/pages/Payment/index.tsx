@@ -9,10 +9,11 @@ import {
   ConfigProvider,
 } from "antd";
 import { useState } from "react";
-import HeaderComponent from "../../components/header";
+import HeaderComponent from "../../components/Header";
 import { CreditCardOutlined } from "@ant-design/icons";
 import { createStyles } from "antd-style";
-import PromptPay_Icon from "../../components/promptpay_icon";
+import PromptPayIcon from "../../components/PromptPayIcon";
+import PromptPayQRCode from "../../components/PromptPayQRCode";
 
 const useStyle = createStyles(({ prefixCls, css }) => ({
   linearGradientButton: css`
@@ -124,7 +125,7 @@ function Payment() {
                     }}
                     onClick={() => handleMethodChange("promptpay")}
                   >
-                    <PromptPay_Icon />
+                    <PromptPayIcon />
                   </Button>
                 </div>
 
@@ -152,7 +153,12 @@ function Payment() {
                   </div>
                 )}
 
-                {paymentMethod === "promptpay" && <div></div>}
+                {paymentMethod === "promptpay" && (
+                  <div>
+                    <h2>Generate PromptPay QR Code</h2>
+                    <PromptPayQRCode mobileNumber="0631456442" amount={1.0} />
+                  </div>
+                )}
 
                 <h3>Order details</h3>
                 <Card
