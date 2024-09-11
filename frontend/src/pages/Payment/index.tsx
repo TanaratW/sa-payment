@@ -51,7 +51,12 @@ const { Header, Content } = Layout;
 
 function Payment() {
   const { styles } = useStyle();
-  const [paymentMethod, setPaymentMethod] = useState(null);
+
+  const [paymentMethod, setPaymentMethod] = useState<string | null>(null);
+
+  const handleMethodChange = (method: string) => {
+    setPaymentMethod(method);
+  };
   return (
     <ConfigProvider
       button={{ className: styles.linearGradientButton }}
@@ -105,7 +110,7 @@ function Payment() {
                       height: "50px",
                       fontWeight: "630",
                     }}
-                    onClick={() => setPaymentMethod("card")}
+                    onClick={() => handleMethodChange("card")}
                   >
                     <div style={{ fontSize: "16px" }}>Credit/Debit Card</div>
                   </Button>
@@ -117,7 +122,7 @@ function Payment() {
                       width: "250px",
                       height: "50px",
                     }}
-                    onClick={() => setPaymentMethod("promptpay")}
+                    onClick={() => handleMethodChange("promptpay")}
                   >
                     <PromptPay_Icon />
                   </Button>
@@ -146,6 +151,8 @@ function Payment() {
                     />
                   </div>
                 )}
+
+                {paymentMethod === "promptpay" && <div></div>}
 
                 <h3>Order details</h3>
                 <Card
