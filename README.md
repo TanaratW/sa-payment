@@ -13,6 +13,6 @@
       npm install
       npm run dev
 
-- Installation
+- Desing Tool: Ant Design
 
       npm install antd --save
