@@ -155,7 +155,7 @@ function Payment() {
 
                 {paymentMethod === "promptpay" && (
                   <div>
-                    <h2>Generate PromptPay QR Code</h2>
+                    <h3>Generate PromptPay QR Code</h3>
                     <PromptPayQRCode mobileNumber="0631456442" amount={1.0} />
                   </div>
                 )}
