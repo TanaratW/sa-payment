@@ -7,13 +7,16 @@ import {
   Row,
   Col,
   ConfigProvider,
+  Spin,
+  Alert,
 } from "antd";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import HeaderComponent from "../../components/Header";
 import { CreditCardOutlined } from "@ant-design/icons";
 import { createStyles } from "antd-style";
 import PromptPayIcon from "../../components/PromptPayIcon";
 import PromptPayQRCode from "../../components/PromptPayQRCode";
+import { GetPriceById, GetTitleById } from "../../services/http";
 
 const useStyle = createStyles(({ prefixCls, css }) => ({
   linearGradientButton: css`
@@ -54,10 +57,57 @@ function Payment() {
   const { styles } = useStyle();
 
   const [paymentMethod, setPaymentMethod] = useState<string | null>(null);
+  const [courseTitle, setCourseTitle] = useState<string | null>(null);
+  const [coursePrice, setCoursePrice] = useState<number | undefined>(undefined);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
 
   const handleMethodChange = (method: string) => {
     setPaymentMethod(method);
   };
+
+  useEffect(() => {
+    async function fetchCourseData() {
+      try {
+        const courseId = 1;
+
+        const titleResponse = await GetTitleById(courseId);
+        if (titleResponse) {
+          setCourseTitle(titleResponse.title);
+        } else {
+          setError("Failed to fetch course title");
+        }
+
+        const priceResponse = await GetPriceById(courseId);
+        if (priceResponse) {
+          setCoursePrice(priceResponse.price);
+        } else {
+          setError("Failed to fetch course price");
+        }
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      } catch (error) {
+        setError("An error occurred while fetching course data");
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchCourseData();
+  }, []);
+
+  if (loading)
+    return (
+      <div style={{ textAlign: "center", padding: "50px" }}>
+        <Spin size="large" />
+      </div>
+    );
+  if (error)
+    return (
+      <div style={{ textAlign: "center", padding: "50px" }}>
+        <Alert message={error} type="error" />
+      </div>
+    );
+
   return (
     <ConfigProvider
       button={{ className: styles.linearGradientButton }}
@@ -156,7 +206,10 @@ function Payment() {
                 {paymentMethod === "promptpay" && (
                   <div>
                     <h3>Generate PromptPay QR Code</h3>
-                    <PromptPayQRCode mobileNumber="0631456442" amount={1.0} />
+                    <PromptPayQRCode
+                      mobileNumber="0631456442"
+                      amount={coursePrice}
+                    />
                   </div>
                 )}
 
@@ -176,14 +229,18 @@ function Payment() {
                       flexDirection: "row",
                     }}
                   >
-                    <span style={{ flexGrow: 1 }}>Course name</span>
+                    <span style={{ flexGrow: 1 }}>
+                      {courseTitle || "Loading..."}
+                    </span>
                     <span
                       style={{
                         display: "flex",
                         justifyContent: "flex-end",
                       }}
                     >
-                      THB 0,000.00
+                      {coursePrice !== undefined
+                        ? `THB ${coursePrice.toLocaleString()}`
+                        : "Loading..."}
                     </span>
                   </div>
                 </Card>
@@ -205,7 +262,11 @@ function Payment() {
                   }}
                 >
                   <span>Original Price:</span>
-                  <span>THB 0,000.00</span>
+                  <span>
+                    {coursePrice !== undefined
+                      ? `THB ${coursePrice.toLocaleString()}`
+                      : "Loading..."}
+                  </span>
                 </div>
                 <Divider />
                 <div
@@ -218,7 +279,11 @@ function Payment() {
                   }}
                 >
                   <span>Total:</span>
-                  <span>THB 0,000.00</span>
+                  <span>
+                    {coursePrice !== undefined
+                      ? `THB ${coursePrice.toLocaleString()}`
+                      : "Loading..."}
+                  </span>
                 </div>
                 <Button
                   type="primary"
